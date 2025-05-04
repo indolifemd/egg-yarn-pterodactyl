@@ -1,18 +1,21 @@
-name: Docker Image CI
+name: Indolife-Project on: push: branches: [ "20" ] pull_request: branches: [ "20" ]
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+jobs: build: runs-on: ubuntu-latest
 
-jobs:
+steps:
+- uses: actions/checkout@v4
 
-  build:
+- name: Login to GitHub Container Registry
+  uses: docker/login-action@v3
+  with:
+    registry: ghcr.io
+    username: ${{ github.actor }}
+    password: ${{ secrets.GITHUB_TOKEN }}
 
-    runs-on: ubuntu-latest
+- name: Build and push Docker image
+  uses: docker/build-push-action@v5
+  with:
+    context: .
+    push: true
+    tags: ghcr.io/indolifemd/indolife-yarn-egg:20
 
-    steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
